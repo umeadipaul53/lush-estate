@@ -10,7 +10,7 @@ import {
 const API = axios.create({
   baseURL:
     process.env.NODE_ENV === "production"
-      ? "https://grace-route-real-estate-company.onrender.com/api"
+      ? "https://lush-estate-backend.onrender.com/api"
       : "http://localhost:4000/api",
   headers: { "Content-Type": "application/json" },
   withCredentials: true, // send cookies (HttpOnly refresh token)
