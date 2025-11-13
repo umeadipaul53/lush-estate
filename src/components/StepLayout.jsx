@@ -104,7 +104,8 @@ const StepLayout = ({ children }) => {
       <div className="w-full sm:max-w-2xl md:max-w-3xl bg-white shadow-lg rounded-2xl p-6 sm:p-10 space-y-6">
         <ProgressBar currentStep={currentStep} totalSteps={TOTAL_STEPS} />
 
-        <div className="py-4">
+        {/* 👇 Provide control props to children */}
+        <div className="py-6">
           {React.cloneElement(children, { setIsNextEnabled, isNextEnabled })}
         </div>
 
@@ -114,7 +115,7 @@ const StepLayout = ({ children }) => {
           onNext={handleNext}
           onPrevious={handlePrevious}
           onPlotReserve={handlePlotReservation}
-          disabled={!isNextEnabled}
+          disabled={!isNextEnabled} // 👈 disable next
         />
       </div>
     </div>
