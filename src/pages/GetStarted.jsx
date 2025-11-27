@@ -99,7 +99,7 @@ const GetStarted = () => {
   }, [isAuthenticated, user, navigate]);
 
   return (
-    <div className="max-w-2xl mx-auto p-24">
+    <div className="max-w-2xl mx-auto px-6 py-12 sm:px-12 sm:py-16">
       <h2 className="text-2xl font-bold mb-4 text-center">
         Begin Your Journey
       </h2>
