@@ -35,9 +35,9 @@ function AdminLayout() {
     { label: "Dashboard", path: "/admin", icon: <LayoutDashboard size={18} /> },
     { label: "Manage Users", path: "/admin/users", icon: <Users size={18} /> },
     {
-      label: "View Buy Orders",
-      path: "/admin/buy-orders",
-      icon: <ShoppingCart size={18} />, // 🛒 Orders icon
+      label: "Manage Estate",
+      path: "/admin/manage-estate",
+      icon: <Building2 size={18} />, // 🛒 Orders icon
     },
     {
       label: "View Listing Orders",

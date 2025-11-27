@@ -1,10 +1,12 @@
 // src/App.jsx
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import "./App.css";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { restoreEstate } from "./reducers/estateReducer";
 import Home from "./pages/Home";
 import GetStarted from "./pages/GetStarted";
+import SelectEstate from "./pages/SelectEstate";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Dashboard from "./pages/Dashboard";
@@ -22,7 +24,8 @@ import Step6 from "./pages/Step6";
 import PlotReservation from "./pages/PlotReservation";
 import Questionnaire from "./pages/Questionnaire";
 import StepLayout from "./components/StepLayout";
-
+import ManageEstate from "./admin/ManageEstate";
+import CreateEstate from "./admin/CreateEstate";
 import {
   UserProtectedRoute,
   AdminProtectedRoute,
@@ -30,10 +33,15 @@ import {
 import AuthProvider from "./components/AuthProvider";
 
 function App() {
+  const dispatch = useDispatch();
   const location = useLocation();
   const scrollRef = useRef(null);
 
   const isAdminRoute = /^\/admin(\/|$)/.test(location.pathname);
+
+  useEffect(() => {
+    dispatch(restoreEstate());
+  }, [dispatch]);
 
   return (
     <AuthProvider>
@@ -47,6 +55,7 @@ function App() {
               <main className="flex-grow">
                 <Routes>
                   <Route path="/" element={<Home />} />
+                  <Route path="/select-estate" element={<SelectEstate />} />
                   <Route path="/get-started" element={<GetStarted />} />
                   <Route path="/secured-account/login" element={<Login />} />
 
@@ -156,6 +165,8 @@ function App() {
               >
                 <Route index element={<AdminDashboard />} />
                 <Route path="users" element={<ManageUsers />} />
+                <Route path="manage-estate" element={<ManageEstate />} />
+                <Route path="create-estate" element={<CreateEstate />} />
               </Route>
 
               <Route path="*" element={<NotFound />} />

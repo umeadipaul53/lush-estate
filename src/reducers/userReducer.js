@@ -20,11 +20,11 @@ const persistUser = (data) => {
 // ---------------------------------------------------------
 export const startJourney = createAsyncThunk(
   "user/startJourney",
-  async (email, { rejectWithValue }) => {
+  async ({ email, estateId }, { rejectWithValue }) => {
     try {
       const response = await API.post(
         "/auth/v1/start-client-journey",
-        { email },
+        { email, estateId },
         { withCredentials: true }
       );
 
@@ -51,11 +51,11 @@ export const startJourney = createAsyncThunk(
 // ---------------------------------------------------------
 export const startJourneyWithName = createAsyncThunk(
   "user/startJourneyWithName",
-  async ({ email, name, phone }, { rejectWithValue }) => {
+  async ({ email, name, phone, estateId }, { rejectWithValue }) => {
     try {
       const response = await API.post(
         "/auth/v1/start-client-journey",
-        { email, name, phone },
+        { email, name, phone, estateId },
         { withCredentials: true }
       );
 
@@ -137,6 +137,7 @@ const userSlice = createSlice({
 
       clearAccessToken();
       persistUser(null);
+      localStorage.removeItem("estateId");
     },
     clearError: (state) => {
       state.error = null;

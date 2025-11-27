@@ -15,7 +15,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     dispatch(logoutUser());
-    navigate("/");
+    navigate("/select-estate");
   };
 
   return (
@@ -45,7 +45,7 @@ const Navbar = () => {
         {/* CTA Button (Desktop) */}
         {isAuthenticated && (
           <button
-            className="hidden md:block px-6 py-2 rounded-full font-semibold shadow-lg bg-emerald-700 text-white hover:bg-emerald-900 transition-colors"
+            className="hidden md:block px-6 py-2 rounded-full font-semibold shadow-lg bg-black text-white hover:bg-black transition-colors"
             onClick={handleLogout}
           >
             Exit
@@ -82,7 +82,7 @@ const Navbar = () => {
 
           {isAuthenticated && (
             <button
-              className="bg-emerald-700 hover:bg-emerald-900 transition-all text-white px-6 py-2 rounded-full font-semibold shadow-lg"
+              className="bg-black hover:bg-black transition-all text-white px-6 py-2 rounded-full font-semibold shadow-lg"
               onClick={handleLogout}
             >
               Exit

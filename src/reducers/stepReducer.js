@@ -4,9 +4,9 @@ import API from "../api/api";
 // ✅ fetchSteps
 export const fetchTotalSteps = createAsyncThunk(
   "steps/fetchTotalSteps",
-  async (_, { rejectWithValue }) => {
+  async (estateId, { rejectWithValue }) => {
     try {
-      const response = await API.get("/auth/v1/fetch-all-steps", {
+      const response = await API.get(`/auth/v1/fetch-all-steps/${estateId}`, {
         withCredentials: true,
       });
 
@@ -57,17 +57,20 @@ export const completeSteps = createAsyncThunk(
 const stepsSlice = createSlice({
   name: "steps",
   initialState: {
-    steps: [],
-    count: 0, // array of property objects
+    estate: null, // full estate object from backend
+    steps: [], // ordered steps array
+    count: 0,
     loading: false,
     error: null,
-    watchedSteps: {},
+    watchedSteps: {}, // { [stepNumber]: true }
   },
   reducers: {
-    // Action to mark a step as watched
     markStepWatched: (state, action) => {
-      const stepNumber = action.payload;
-      state.watchedSteps[stepNumber] = true;
+      const { stepNumber, videosWatched } = action.payload;
+      state.watchedSteps[stepNumber] = {
+        videosWatched,
+        completed: videosWatched.every((v) => v),
+      };
     },
   },
   extraReducers: (builder) => {
@@ -78,8 +81,11 @@ const stepsSlice = createSlice({
       })
       .addCase(fetchTotalSteps.fulfilled, (state, action) => {
         state.loading = false;
-        state.steps = action.payload.data || [];
-        state.count = action.payload.data.totalSteps;
+        const steps = (action.payload.data?.steps || [])
+          .slice()
+          .sort((a, b) => a.stepNumber - b.stepNumber);
+        state.steps = steps;
+        state.count = steps.length;
       })
       .addCase(fetchTotalSteps.rejected, (state, action) => {
         state.loading = false;
@@ -92,6 +98,19 @@ const stepsSlice = createSlice({
       })
       .addCase(completeSteps.fulfilled, (state, action) => {
         state.loading = false;
+        const stepNumber = action.meta.arg.stepNumber; // ✅ use arg, not backend
+        // Mark all videos watched as completed
+        if (state.watchedSteps[stepNumber]) {
+          state.watchedSteps[stepNumber].completed = true;
+          state.watchedSteps[stepNumber].videosWatched = state.watchedSteps[
+            stepNumber
+          ].videosWatched.map(() => true);
+        } else {
+          state.watchedSteps[stepNumber] = {
+            videosWatched: [],
+            completed: true,
+          };
+        }
       })
       .addCase(completeSteps.rejected, (state, action) => {
         state.loading = false;

@@ -15,9 +15,9 @@ export const answerQuestions = createAsyncThunk(
         }
       );
       console.log("Backend response:", response.data);
-      const { message, data } = response.data;
+      const { message, data, totalScore } = response.data;
 
-      return { message, data };
+      return { message, data, totalScore };
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to submit answers"
@@ -30,11 +30,14 @@ export const answerQuestions = createAsyncThunk(
 
 export const fetchQuestions = createAsyncThunk(
   "questionaire/fetchQuestions",
-  async (_, { rejectWithValue }) => {
+  async ({ estateId }, { rejectWithValue }) => {
     try {
-      const response = await API.get("/auth/v1/fetch-all-questions", {
-        withCredentials: true,
-      });
+      const response = await API.get(
+        `/auth/v1/fetch-all-questions/${estateId}`,
+        {
+          withCredentials: true,
+        }
+      );
 
       const { message, data } = response.data; // ✅ use correct variable
 
@@ -59,6 +62,7 @@ const questionaireSlice = createSlice({
     count: 0, // array of property objects
     loading: false,
     error: null,
+    totalScore: 0,
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -69,6 +73,7 @@ const questionaireSlice = createSlice({
       })
       .addCase(answerQuestions.fulfilled, (state, action) => {
         state.loading = false;
+        state.totalScore = action.payload.totalScore;
       })
       .addCase(answerQuestions.rejected, (state, action) => {
         state.loading = false;

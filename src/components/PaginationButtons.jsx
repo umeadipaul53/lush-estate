@@ -30,8 +30,8 @@ const PaginationButtons = ({
           disabled={disabled}
           className={`px-4 py-2 rounded-lg transition-colors ${
             disabled
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-blue-600 text-white hover:bg-blue-700"
+              ? "bg-gray-300 text-gray-200 cursor-not-allowed"
+              : "bg-black text-white hover:bg-black"
           }`}
         >
           Next
@@ -42,8 +42,8 @@ const PaginationButtons = ({
           disabled={disabled}
           className={`px-4 py-2 rounded-lg transition-colors ${
             disabled
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-green-600 text-white hover:bg-green-700"
+              ? "bg-gray-300 text-gray-200 cursor-not-allowed"
+              : "bg-black text-white hover:bg-black"
           }`}
         >
           Plot Reservation

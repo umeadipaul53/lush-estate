@@ -28,7 +28,7 @@ const EstateDescription = () => {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.8 }}
         >
-          Why Choose <span className="text-emerald-400">Lush Estate?</span>
+          Why Choose <span className="text-gray-300">Lush Estate?</span>
         </motion.h2>
 
         <motion.p
@@ -47,7 +47,7 @@ const EstateDescription = () => {
         {/* Feature Cards */}
         <div className="grid md:grid-cols-3 gap-10 mt-10">
           <motion.div
-            className="bg-gray-900/80 p-8 rounded-2xl shadow-lg hover:shadow-emerald-500/20 transition-all"
+            className="bg-gray-900/80 p-8 rounded-2xl shadow-lg hover:shadow-gray-500/20 transition-all"
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
@@ -55,7 +55,7 @@ const EstateDescription = () => {
             data-scroll
             data-scroll-speed="1"
           >
-            <MapPin className="text-emerald-400 w-10 h-10 mx-auto mb-4" />
+            <MapPin className="text-gray-300 w-10 h-10 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">
               Prime Location
             </h3>
@@ -66,7 +66,7 @@ const EstateDescription = () => {
           </motion.div>
 
           <motion.div
-            className="bg-gray-900/80 p-8 rounded-2xl shadow-lg hover:shadow-emerald-500/20 transition-all"
+            className="bg-gray-900/80 p-8 rounded-2xl shadow-lg hover:shadow-gray-500/20 transition-all"
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
@@ -74,7 +74,7 @@ const EstateDescription = () => {
             data-scroll
             data-scroll-speed="1.5"
           >
-            <ShieldCheck className="text-emerald-400 w-10 h-10 mx-auto mb-4" />
+            <ShieldCheck className="text-gray-300 w-10 h-10 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">
               Full Security
             </h3>
@@ -85,7 +85,7 @@ const EstateDescription = () => {
           </motion.div>
 
           <motion.div
-            className="bg-gray-900/80 p-8 rounded-2xl shadow-lg hover:shadow-emerald-500/20 transition-all"
+            className="bg-gray-900/80 p-8 rounded-2xl shadow-lg hover:shadow-gray-500/20 transition-all"
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
@@ -93,7 +93,7 @@ const EstateDescription = () => {
             data-scroll
             data-scroll-speed="2"
           >
-            <TrendingUp className="text-emerald-400 w-10 h-10 mx-auto mb-4" />
+            <TrendingUp className="text-gray-300 w-10 h-10 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">
               Investment Growth
             </h3>

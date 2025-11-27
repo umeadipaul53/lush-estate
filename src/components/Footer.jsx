@@ -25,7 +25,7 @@ const Footer = () => {
           {/* Tehlex logo placeholder */}
           <div className="flex items-center gap-2">
             {/* <img src="/logos/tehlex.png" alt="Tehlex Logo" className="h-6" /> use in place of Building2 */}
-            <Building2 className="text-emerald-400 w-6 h-6" />
+            <Building2 className="text-gray-300 w-6 h-6" />
             <span className="text-sm uppercase tracking-widest font-semibold">
               Tehlex
             </span>
@@ -33,7 +33,7 @@ const Footer = () => {
 
           {/* Certified Estate */}
           <div className="flex items-center gap-2">
-            <ShieldCheck className="text-emerald-400 w-6 h-6" />
+            <ShieldCheck className="text-gray-300 w-6 h-6" />
             <span className="text-sm uppercase tracking-widest font-semibold">
               Certified Estate
             </span>
@@ -41,7 +41,7 @@ const Footer = () => {
 
           {/* Developer Excellence */}
           <div className="flex items-center gap-2">
-            <Award className="text-emerald-400 w-6 h-6" />
+            <Award className="text-gray-300 w-6 h-6" />
             <span className="text-sm uppercase tracking-widest font-semibold">
               Developer Excellence
             </span>
@@ -60,8 +60,8 @@ const Footer = () => {
           transition={{ duration: 1, delay: 0.5 }}
         >
           © {currentYear}{" "}
-          <span className="text-white font-semibold">Lush Estate</span>. All
-          rights reserved.
+          <span className="text-white font-semibold">Tehlex</span>. All rights
+          reserved.
         </motion.p>
       </motion.div>
     </footer>

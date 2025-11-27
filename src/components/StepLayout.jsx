@@ -1,121 +1,144 @@
-import React, { useEffect, useState, useRef } from "react";
+// components/StepLayout.jsx
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ProgressBar from "./ProgressBar";
 import PaginationButtons from "./PaginationButtons";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTotalSteps, completeSteps } from "../reducers/stepReducer";
+import StepLoader from "./StepLoader";
 
 const StepLayout = ({ children }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
+  // extract current step from URL (e.g. /user-step-3)
   const match = location.pathname.match(/user-step-(\d+)/);
-  const currentStep = match ? parseInt(match[1], 10) : 1;
+  const currentStepNumber = match ? parseInt(match[1], 10) : 1;
 
-  const { user, isAuthenticated } = useSelector((state) => state.user);
-  const { count } = useSelector((state) => state.steps);
-  const TOTAL_STEPS = count || 6;
-  const { watchedSteps } = useSelector((state) => state.steps);
-  const [isNextEnabled, setIsNextEnabled] = useState(() => {
-    return watchedSteps[currentStep] || false;
-  });
+  const estateId = useSelector((state) => state.estates.estateId);
+  const selectedEstateId = estateId;
 
-  // Local state to track finalStep
-  const [finalStep, setFinalStep] = useState(user?.stepStatus === "completed");
+  const { steps, count, watchedSteps, loading } = useSelector(
+    (state) => state.steps
+  );
+  const { isAuthenticated } = useSelector((s) => s.user);
+
+  const [isNextEnabled, setIsNextEnabled] = useState(false);
+  const [finalStep, setFinalStep] = useState(false);
+
+  // When estate changes (or on mount), fetch estate steps
+  useEffect(() => {
+    if (isAuthenticated && selectedEstateId) {
+      dispatch(fetchTotalSteps(selectedEstateId));
+    }
+  }, [dispatch, isAuthenticated, selectedEstateId]);
+
+  // update Next button enabled state based on watchedSteps
+  useEffect(() => {
+    setIsNextEnabled(Boolean(watchedSteps[currentStepNumber]));
+  }, [watchedSteps, currentStepNumber]);
+
+  // determine the TOTAL_STEPS from fetched estate
+  const TOTAL_STEPS = count || steps.length || 0;
+
+  // helper to find index of current step inside steps array
+  const currentIndex = steps.findIndex(
+    (s) => s.stepNumber === currentStepNumber
+  );
+  const currentStep = currentIndex >= 0 ? steps[currentIndex] : null;
+
+  const goToStepNumber = (stepNumber) => {
+    navigate(`/user-step-${stepNumber}`);
+  };
 
   const handleNext = async () => {
-    if (!isNextEnabled) {
-      console.warn("Next button clicked but video not finished yet");
+    if (!isNextEnabled) return;
+
+    if (!selectedEstateId) {
+      console.warn("No estate selected");
       return;
     }
 
     try {
-      const payload = { estateId: "690cba0a8973df822b3b781e" };
-
-      // Dispatch the step completion
       const result = await dispatch(
-        completeSteps({ stepNumber: currentStep, ...payload })
+        completeSteps({
+          estateId: selectedEstateId,
+          stepNumber: currentStepNumber,
+        })
       ).unwrap();
+      // backend may return nextStep/finalStep - handle gracefully
+      const nextStep = result?.data?.nextStep ?? null;
+      const isFinal = result?.data?.finalStep ?? false;
+      setFinalStep(isFinal);
 
-      const nextStep = result?.data?.nextStep;
-      const finalStep = result?.data?.finalStep;
-
-      // Update finalStep state for UI
-      setFinalStep(finalStep);
-
-      if (finalStep) {
+      if (isFinal) {
         navigate("/plot-reservation");
         return;
       }
 
       if (nextStep) {
-        navigate(`/user-step-${nextStep}`);
+        goToStepNumber(nextStep);
       } else {
-        console.warn("Next step not returned from backend.");
+        // fallback: go to next numerical step that exists
+        const nextIndex = currentIndex + 1;
+        if (steps[nextIndex]) goToStepNumber(steps[nextIndex].stepNumber);
       }
-    } catch (error) {
-      console.error("Failed to complete step:", error);
+    } catch (err) {
+      console.error("complete step failed", err);
     }
   };
 
-  const handlePrevious = async () => {
-    if (currentStep > 1) navigate(`/user-step-${currentStep - 1}`);
-  };
-
-  const handlePlotReservation = async () => {
-    try {
-      const payload = { estateId: "690cba0a8973df822b3b781e" };
-
-      // Dispatch the step completion
-      const result = await dispatch(
-        completeSteps({ stepNumber: currentStep, ...payload })
-      ).unwrap();
-
-      const nextStep = result?.data?.nextStep;
-      const finalStep = result?.data?.finalStep;
-
-      // Update finalStep state for UI
-      setFinalStep(finalStep);
-
-      if (finalStep) {
-        navigate("/plot-reservation");
-        return;
-      }
-
-      if (nextStep) {
-        navigate(`/user-step-${nextStep}`);
-      } else {
-        console.warn("Next step not returned from backend.");
-      }
-    } catch (error) {
-      console.error("Failed to complete step:", error);
+  const handlePrevious = () => {
+    if (!steps.length) return;
+    // find previous existing
+    const prevIndex = currentIndex - 1;
+    if (prevIndex >= 0 && steps[prevIndex]) {
+      goToStepNumber(steps[prevIndex].stepNumber);
     }
   };
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      dispatch(fetchTotalSteps());
-    }
-  }, [dispatch, isAuthenticated]);
+  const handlePlotReservation = handleNext; // reuse same flow
+
+  // If steps are loading show placeholder
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div>Loading steps…</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-24">
       <div className="w-full sm:max-w-2xl md:max-w-3xl bg-white shadow-lg rounded-2xl p-6 sm:p-10 space-y-6">
-        <ProgressBar currentStep={currentStep} totalSteps={TOTAL_STEPS} />
+        <ProgressBar currentStep={currentStepNumber} totalSteps={TOTAL_STEPS} />
 
-        {/* 👇 Provide control props to children */}
+        {/* Render the dynamic step content */}
         <div className="py-6">
-          {React.cloneElement(children, { setIsNextEnabled, isNextEnabled })}
+          {currentStep ? (
+            <StepLoader
+              step={currentStep}
+              setIsNextEnabled={setIsNextEnabled}
+              isNextEnabled={isNextEnabled}
+            />
+          ) : (
+            <div className="text-center py-12">
+              <h2 className="text-xl font-semibold">Step not found</h2>
+              <p className="text-gray-500 mt-2">
+                The step you requested doesn't exist for this estate.
+              </p>
+            </div>
+          )}
         </div>
 
         <PaginationButtons
-          step={currentStep}
+          step={currentStepNumber}
           totalSteps={TOTAL_STEPS}
           onNext={handleNext}
           onPrevious={handlePrevious}
           onPlotReserve={handlePlotReservation}
-          disabled={!isNextEnabled} // 👈 disable next
+          disabled={!isNextEnabled}
         />
       </div>
     </div>

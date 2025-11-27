@@ -41,13 +41,13 @@ const AuthProvider = ({ children }) => {
           // refresh failed or no token available
           dispatch(logoutUser());
           clearAccessToken();
-          window.location.href = "/get-started";
+          window.location.href = "/select-estate";
         }
       } catch (err) {
         // any parsing / network error -> logout
         dispatch(logoutUser());
         clearAccessToken();
-        window.location.href = "/get-started";
+        window.location.href = "/select-estate";
       }
     };
 

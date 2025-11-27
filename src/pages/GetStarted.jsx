@@ -9,6 +9,7 @@ const GetStarted = () => {
   const { user, loading, isAuthenticated, error } = useSelector(
     (state) => state.user
   );
+  const estateId = useSelector((state) => state.estates.estateId);
 
   const [stage, setStage] = useState(1); // 1 = email, 2 = new user info, 3 = done
   const [email, setEmail] = useState("");
@@ -23,7 +24,7 @@ const GetStarted = () => {
     setMessage("");
 
     try {
-      const result = await dispatch(startJourney(email)).unwrap();
+      const result = await dispatch(startJourney({ email, estateId })).unwrap();
       const { user } = result;
 
       if (user?.isNewUser) {
@@ -48,7 +49,7 @@ const GetStarted = () => {
 
     try {
       const result = await dispatch(
-        startJourneyWithName({ email, name, phone })
+        startJourneyWithName({ email, name, phone, estateId })
       ).unwrap();
 
       const { user } = result;
@@ -67,25 +68,26 @@ const GetStarted = () => {
     setStage(3);
     setStep(user?.step);
 
-    const { isStep, isReserve, isQuestion, step } = user;
+    const { currentProgress, step } = user;
 
     // Redirect Logic
-    if (!isStep && step?.stepNumber) {
+    if (currentProgress.stepStatus === "pending" && step?.stepNumber) {
       navigate(`/user-step-${step.stepNumber}`);
       return;
     }
 
-    if (isStep && !isReserve && !isQuestion) {
+    if (
+      currentProgress.stepStatus === "completed" &&
+      currentProgress.status === "pending"
+    ) {
       navigate("/plot-reservation");
       return;
     }
 
-    if (isStep && isReserve && !isQuestion) {
-      navigate("/user-questionnaire");
-      return;
-    }
-
-    if (isStep && isReserve && isQuestion) {
+    if (
+      currentProgress.stepStatus === "completed" &&
+      currentProgress.status === "active"
+    ) {
       navigate("/user-dashboard");
       return;
     }
@@ -97,7 +99,7 @@ const GetStarted = () => {
   }, [isAuthenticated, user, navigate]);
 
   return (
-    <div className="max-w-2xl mx-auto p-10">
+    <div className="max-w-2xl mx-auto p-24">
       <h2 className="text-2xl font-bold mb-4 text-center">
         Begin Your Journey
       </h2>
@@ -123,7 +125,7 @@ const GetStarted = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-5 py-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              className="w-full px-5 py-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition"
             />
           </div>
 
@@ -133,7 +135,7 @@ const GetStarted = () => {
             className={`w-full py-4 rounded-xl text-white font-semibold shadow-lg transition-all duration-300 ${
               loading
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600"
+                : "bg-gradient-to-r from-gray-600 to-gray-300 hover:from-gray-500 hover:to-gray-300"
             }`}
           >
             {loading ? "Checking..." : "Continue"}
@@ -161,7 +163,7 @@ const GetStarted = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full px-5 py-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+              className="w-full px-5 py-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition"
             />
           </div>
 
@@ -172,7 +174,7 @@ const GetStarted = () => {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               required
-              className="w-full px-5 py-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+              className="w-full px-5 py-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition"
             />
           </div>
 
@@ -182,7 +184,7 @@ const GetStarted = () => {
             className={`w-full py-4 rounded-xl text-white font-semibold shadow-lg transition-all duration-300 ${
               loading
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+                : "bg-gradient-to-r from-gray-600 to-gray-300 hover:from-gray-500 hover:to-gray-300"
             }`}
           >
             {loading ? "Creating..." : "Start Journey"}

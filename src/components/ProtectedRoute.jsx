@@ -6,13 +6,17 @@ import { PropagateLoader } from "react-spinners";
 import { jwtDecode } from "jwt-decode";
 import { getAccessToken, clearAccessToken } from "../tokenStore";
 import { logoutUser } from "../reducers/userReducer";
+import { useToast } from "../toastContext/useToast";
 
 const ProtectedRoute = ({ children, allowedRole }) => {
+  const { showToast } = useToast();
   const dispatch = useDispatch();
+
   const { user, isAuthenticated, token, loading } = useSelector(
     (state) => state.user
   );
 
+  // ⏳ 1. Show loader while checking user state
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -21,40 +25,53 @@ const ProtectedRoute = ({ children, allowedRole }) => {
     );
   }
 
-  // Prefer token from tokenStore to avoid stale token in state
+  // 🛡 2. Get the freshest token (prefer tokenStore over Redux)
   const storedToken = getAccessToken() || token;
 
-  // If token exists but expired, force logout
+  // ❌ 3. If token exists but is invalid/expired — logout safely
   if (storedToken) {
     try {
       const decoded = jwtDecode(storedToken);
-      if (decoded.exp < Date.now() / 1000) {
-        // expired
+
+      // Token expired?
+      if (decoded.exp * 1000 < Date.now()) {
         dispatch(logoutUser());
         clearAccessToken();
-        return <Navigate to="/get-started" replace />;
+        showToast("Session expired. Please login again.", "error");
+
+        return <Navigate to="/select-estate" replace />;
       }
     } catch (err) {
       dispatch(logoutUser());
       clearAccessToken();
-      return <Navigate to="/get-started" replace />;
+      showToast("Invalid token. Please login again.", "error");
+
+      return <Navigate to="/select-estate" replace />;
     }
   }
 
-  if (!isAuthenticated || !storedToken) {
-    return <Navigate to="/get-started" replace />;
+  // ❌ 4. No token = not logged in
+  if (!storedToken || !isAuthenticated) {
+    showToast("You must be logged in to continue.", "error");
+    return <Navigate to="/select-estate" replace />;
   }
 
+  // 🚫 5. Role check
   if (allowedRole && user?.role !== allowedRole) {
-    return <Navigate to="/" replace />;
+    showToast(`Access denied for role: ${user?.role}`, "error");
+
+    return <Navigate to="/select-estate" replace />;
   }
 
+  // ✔️ 6. All good — allow access
   return children;
 };
 
+// Reusable wrappers
 export const UserProtectedRoute = ({ children }) => (
   <ProtectedRoute allowedRole="user">{children}</ProtectedRoute>
 );
+
 export const AdminProtectedRoute = ({ children }) => (
   <ProtectedRoute allowedRole="admin">{children}</ProtectedRoute>
 );
