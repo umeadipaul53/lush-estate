@@ -48,7 +48,7 @@ const SelectEstate = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-24">
+    <div className="max-w-2xl mx-auto px-6 py-12 sm:px-12 sm:py-16">
       <form
         onSubmit={handleSelectEstate}
         className="bg-white shadow-xl rounded-3xl p-16 max-w-2xl mx-auto space-y-6"
