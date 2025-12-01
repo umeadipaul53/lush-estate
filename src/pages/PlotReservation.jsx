@@ -2,10 +2,14 @@ import React from "react";
 import { motion } from "framer-motion";
 import { MapPin, ClipboardList } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { checkQuestionaireAccess } from "../reducers/estateReducer";
+import { useToast } from "../toastContext/useToast";
 
 const PlotReservation = () => {
-  const estate = useSelector((state) => state.estates.estate);
+  const dispatch = useDispatch();
+  const { showToast } = useToast();
+  const { estate, estateId } = useSelector((state) => state.estates);
   const navigate = useNavigate();
 
   const estateName = estate.estateName;
@@ -20,8 +24,19 @@ const PlotReservation = () => {
     }
   };
 
-  const handleInspection = () => {
-    navigate("/user-questionnaire");
+  const handleInspection = async () => {
+    try {
+      const res = await dispatch(checkQuestionaireAccess(estateId)).unwrap();
+
+      if (res.proceed) {
+        navigate("/user-questionnaire");
+      } else {
+        showToast(res.message, "error");
+      }
+    } catch (error) {
+      console.log("INSPECTION ERROR:", error);
+      showToast(error.message || "Something went wrong", "error");
+    }
   };
 
   return (

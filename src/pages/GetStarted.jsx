@@ -2,10 +2,13 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { startJourney, startJourneyWithName } from "../reducers/userReducer";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../toastContext/useToast";
 
 const GetStarted = () => {
+  const { showToast } = useToast();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const { user, loading, isAuthenticated, error } = useSelector(
     (state) => state.user
   );
@@ -18,22 +21,20 @@ const GetStarted = () => {
   const [step, setStep] = useState(null);
   const [message, setMessage] = useState("");
 
-  // Handle email submission
+  // Stage 1: handle email submission
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
 
     try {
       const result = await dispatch(startJourney({ email, estateId })).unwrap();
-      const { user } = result;
+      const fetchedUser = result.user;
 
-      if (user?.isNewUser) {
-        // Backend says this is a new user → show Stage 2
+      if (fetchedUser?.isNewUser) {
         setStage(2);
         setMessage("We need your details to continue.");
       } else {
-        // Existing user → move to Stage 3
-        setStep(user?.step);
+        setStep(fetchedUser?.step || null);
         setMessage("Welcome back!");
         setStage(3);
       }
@@ -42,7 +43,7 @@ const GetStarted = () => {
     }
   };
 
-  // Handle new user registration
+  // Stage 2: handle new user registration
   const handleNewUserSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
@@ -51,9 +52,9 @@ const GetStarted = () => {
       const result = await dispatch(
         startJourneyWithName({ email, name, phone, estateId })
       ).unwrap();
+      const fetchedUser = result.user;
 
-      const { user } = result;
-      setStep(user?.step);
+      setStep(fetchedUser?.step || null);
       setMessage("Journey started successfully!");
       setStage(3);
     } catch (err) {
@@ -61,40 +62,38 @@ const GetStarted = () => {
     }
   };
 
+  // Stage 3: redirect if user exists and is not new
   useEffect(() => {
     if (!isAuthenticated || !user) return;
     if (user.isNewUser) return; // skip redirect for brand-new users
 
-    setStage(3);
-    setStep(user?.step);
-
     const { currentProgress, step } = user;
 
-    // Redirect Logic
-    if (currentProgress.stepStatus === "pending" && step?.stepNumber) {
-      navigate(`/user-step-${step.stepNumber}`);
+    // Redirect logic
+    if (currentProgress?.stepStatus === "pending" && step?.stepNumber) {
+      navigate(`/user-step-${step.stepNumber}`, { replace: true });
       return;
     }
 
     if (
-      currentProgress.stepStatus === "completed" &&
-      currentProgress.status === "pending"
+      currentProgress?.stepStatus === "completed" &&
+      currentProgress?.status === "pending"
     ) {
-      navigate("/plot-reservation");
+      navigate("/plot-reservation", { replace: true });
       return;
     }
 
     if (
-      currentProgress.stepStatus === "completed" &&
-      currentProgress.status === "active"
+      currentProgress?.stepStatus === "completed" &&
+      currentProgress?.status === "active"
     ) {
-      navigate("/user-dashboard");
+      navigate("/user-dashboard", { replace: true });
       return;
     }
 
     // fallback
     if (step?.stepNumber) {
-      navigate(`/user-step-${step.stepNumber}`);
+      navigate(`/user-step-${step.stepNumber}`, { replace: true });
     }
   }, [isAuthenticated, user, navigate]);
 
@@ -103,9 +102,10 @@ const GetStarted = () => {
       <h2 className="text-2xl font-bold mb-4 text-center">
         Begin Your Journey
       </h2>
-      {message && <p className="text-blue-600 mb-4">{message}</p>}
 
-      {/* Stage 1: Ask for email */}
+      {message && <p className="text-blue-600 mb-4 text-center">{message}</p>}
+
+      {/* Stage 1 */}
       {stage === 1 && (
         <form
           onSubmit={handleEmailSubmit}
@@ -118,16 +118,14 @@ const GetStarted = () => {
             Enter your email to continue
           </p>
 
-          <div className="relative">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-5 py-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition"
-            />
-          </div>
+          <input
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full px-5 py-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition"
+          />
 
           <button
             type="submit"
@@ -143,7 +141,7 @@ const GetStarted = () => {
         </form>
       )}
 
-      {/* Stage 2: Ask for name + phone */}
+      {/* Stage 2 */}
       {stage === 2 && (
         <form
           onSubmit={handleNewUserSubmit}
@@ -156,27 +154,22 @@ const GetStarted = () => {
             Enter your details to start your journey
           </p>
 
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Full Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="w-full px-5 py-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition"
-            />
-          </div>
-
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Phone Number"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              required
-              className="w-full px-5 py-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition"
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Full Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            className="w-full px-5 py-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition"
+          />
+          <input
+            type="text"
+            placeholder="Phone Number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            required
+            className="w-full px-5 py-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition"
+          />
 
           <button
             type="submit"
@@ -194,7 +187,7 @@ const GetStarted = () => {
 
       {/* Stage 3 */}
       {stage === 3 && user && step && (
-        <div className="mt-6 border-t pt-4 max-w-2xl mx-auto">
+        <div className="mt-6 border-t pt-4 max-w-2xl mx-auto text-center">
           <h3 className="text-xl font-semibold mb-2">
             Welcome {user.name || "Guest"}!
           </h3>

@@ -113,7 +113,6 @@ const Questionnaire = () => {
       const result = await dispatch(secheduleTour(tourForm)).unwrap();
       showToast(result.message, "success");
       setOpenModal(false);
-      setTimeout(() => navigate("/user-dashboard"), 3000);
     } catch (err) {
       showToast(
         typeof err === "string"
@@ -140,36 +139,69 @@ const Questionnaire = () => {
   if (submitted) {
     if (totalScore >= 16) {
       submittedContent = (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-green-50 px-4">
           <CheckCircle className="text-green-600 w-16 h-16 mb-4" />
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Thank You!</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center">
+            Thank You!
+          </h1>
           <p className="text-gray-600 text-lg mb-12 text-center px-6">
             Great news! You are fully approved for a physical inspection at Lush
-            Estate. Please share your preferred inspection day and time.
+            Estate. Please share your preferred inspection day and time, or chat
+            with our agent on WhatsApp.
           </p>
-          <button
-            onClick={() => setOpenModal(true)}
-            className="w-2xl bg-black text-white py-3 rounded-xl font-semibold hover:bg-black transition"
-          >
-            Schedule for a Physical Inspection
-          </button>
+
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* WhatsApp Chat Button */}
+            <a
+              href="https://wa.me/2349048082624"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-black hover:bg-black text-white py-3 px-6 rounded-xl font-semibold transition text-center w-full sm:w-auto"
+            >
+              Chat with Our Agent
+            </a>
+
+            {/* Physical Inspection Button */}
+            <button
+              onClick={() => setOpenModal(true)}
+              className="bg-black text-white py-3 px-6 rounded-xl font-semibold hover:bg-gray-900 transition w-full sm:w-auto"
+            >
+              Schedule Physical Inspection
+            </button>
+          </div>
         </div>
       );
     } else if (totalScore >= 14) {
       submittedContent = (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-green-50 px-4">
           <CheckCircle className="text-green-600 w-16 h-16 mb-4" />
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Thank You!</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center">
+            Thank You!
+          </h1>
           <p className="text-gray-600 text-lg mb-12 text-center px-6">
             You qualify for a physical inspection. Kindly send your preferred
-            inspection day and time.
+            inspection day and time or chat with our agent on WhatsApp.
           </p>
-          <button
-            onClick={() => setOpenModal(true)}
-            className="w-full bg-orange-500 text-white py-3 rounded-xl font-semibold hover:bg-orange-600 transition"
-          >
-            Schedule for a Physical Inspection
-          </button>
+
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* WhatsApp Chat Button */}
+            <a
+              href="https://wa.me/2349048082624"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-black hover:bg-black text-white py-3 px-6 rounded-xl font-semibold transition text-center w-full sm:w-auto"
+            >
+              Chat with Our Agent
+            </a>
+
+            {/* Physical Inspection Button */}
+            <button
+              onClick={() => setOpenModal(true)}
+              className="bg-black text-white py-3 px-6 rounded-xl font-semibold hover:bg-gray-900 transition w-full sm:w-auto"
+            >
+              Schedule Physical Inspection
+            </button>
+          </div>
         </div>
       );
     } else if (totalScore >= 10) {
@@ -357,7 +389,7 @@ const Questionnaire = () => {
 
               <button
                 type="submit"
-                className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition"
+                className="w-full bg-black text-white py-3 rounded-xl font-semibold hover:bg-black transition"
               >
                 {tourLoading ? "Confirming ..." : "Confirm Schedule"}
               </button>

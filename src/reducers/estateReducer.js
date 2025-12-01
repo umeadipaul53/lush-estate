@@ -88,6 +88,26 @@ export const selectEstate = createAsyncThunk(
   }
 );
 
+// --- Check if a user has submitted a questionaire for an estate
+export const checkQuestionaireAccess = createAsyncThunk(
+  "estates/checkQuestionaireAccess",
+  async (estateId, { rejectWithValue }) => {
+    try {
+      const res = await API.post(
+        `/auth/v1/check-questionaire-access/${estateId}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      const { message, proceed } = res.data;
+      return { message, proceed };
+    } catch (err) {
+      return rejectWithValue(err.response?.data || { message: err.message });
+    }
+  }
+);
+
 const estatesSlice = createSlice({
   name: "estates",
   initialState: {
@@ -105,6 +125,7 @@ const estatesSlice = createSlice({
     count: 0,
     loading: false,
     error: null,
+    proceed: false,
   },
   reducers: {
     restoreEstate(state) {
@@ -167,6 +188,19 @@ const estatesSlice = createSlice({
         state.estate = action.payload.data.estate;
       })
       .addCase(selectEstate.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // --- Check if a user has submitted a questionaire for an estate
+      .addCase(checkQuestionaireAccess.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(checkQuestionaireAccess.fulfilled, (state, action) => {
+        state.loading = false;
+        state.proceed = action.payload.proceed;
+      })
+      .addCase(checkQuestionaireAccess.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

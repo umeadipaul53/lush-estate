@@ -31,6 +31,7 @@ import {
   AdminProtectedRoute,
 } from "./components/ProtectedRoute";
 import AuthProvider from "./components/AuthProvider";
+import FacebookPixel from "./FacebookPixel";
 
 function App() {
   const dispatch = useDispatch();
@@ -45,6 +46,7 @@ function App() {
 
   return (
     <AuthProvider>
+      {/* <FacebookPixel /> */}
       <div className="flex flex-col min-h-screen">
         {/* Navbar for non-admin routes */}
         {!isAdminRoute && <Navbar />}

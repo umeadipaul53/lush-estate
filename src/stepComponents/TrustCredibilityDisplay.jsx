@@ -13,17 +13,37 @@ export default function TrustCredibilityDisplay({
   );
 
   useEffect(() => {
-    // Enable next immediately
+    // Next button should always be active for this step
     setIsNextEnabled(true);
 
     // Mark step as completed in Redux if not already
-    if (!watchedState?.completed) {
-      dispatch(markStepWatched({ stepNumber, videosWatched: [] }));
-    }
-  }, [setIsNextEnabled, dispatch, stepNumber, watchedState]);
+    dispatch(
+      markStepWatched({ stepNumber, videosWatched: [], completed: true })
+    );
+  }, [setIsNextEnabled, dispatch, stepNumber]);
+
+  // Cloudinary optimized video + poster
+  const transformCloudinaryVideo = (url) => {
+    if (!url) return { video: null, poster: null };
+
+    // If the video is an array, use the first one
+    const videoUrl = Array.isArray(url) ? url[0] : url;
+
+    if (typeof videoUrl !== "string") return { video: null, poster: null };
+
+    const parts = videoUrl.split("/upload/");
+    if (parts.length !== 2) return { video: videoUrl, poster: null };
+
+    const publicId = parts[1].replace(".mp4", "");
+    return {
+      video: `${parts[0]}/upload/q_auto:good,f_auto/${publicId}.mp4`, // Keep .mp4
+      poster: `${parts[0]}/upload/so_0/${publicId}.jpg`,
+    };
+  };
 
   return (
     <div>
+      {/* Heading */}
       <h1 className="text-3xl font-bold mb-4 text-center">{data.heading}</h1>
       <p className="text-gray-600 mb-6 text-center">{data.description}</p>
 
@@ -38,6 +58,7 @@ export default function TrustCredibilityDisplay({
                 src={c}
                 alt={`certificate-${idx}`}
                 className="w-32 h-20 object-cover rounded"
+                loading="lazy"
               />
             ))}
           </div>
@@ -59,11 +80,13 @@ export default function TrustCredibilityDisplay({
                     src={p.beforeImage}
                     alt="before"
                     className="w-1/2 rounded"
+                    loading="lazy"
                   />
                   <img
                     src={p.afterImage}
                     alt="after"
                     className="w-1/2 rounded"
+                    loading="lazy"
                   />
                 </div>
               </div>
@@ -77,17 +100,29 @@ export default function TrustCredibilityDisplay({
         <div className="mb-6">
           <h4 className="font-semibold mb-2">Testimonials</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {data.testimonials.map((t, idx) => (
-              <div key={idx} className="bg-white p-4 rounded-lg shadow">
-                <h5 className="font-medium">{t.name}</h5>
-                <p className="text-gray-600 mb-2">{t.text}</p>
-                {t.video && (
-                  <video controls className="w-full rounded-md">
-                    <source src={t.video} type="video/mp4" />
-                  </video>
-                )}
-              </div>
-            ))}
+            {data.testimonials.map((t, idx) => {
+              const { video, poster } = transformCloudinaryVideo(t.video);
+
+              return (
+                <div key={idx} className="bg-white p-4 rounded-lg shadow">
+                  <h5 className="font-medium">{t.name}</h5>
+                  <p className="text-gray-600 mb-2">{t.text}</p>
+
+                  {video && (
+                    <div className="rounded-md overflow-hidden">
+                      <video
+                        controls
+                        preload="metadata"
+                        poster={poster}
+                        className="w-full rounded-md"
+                      >
+                        <source src={video} type="video/mp4" />
+                      </video>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -103,6 +138,7 @@ export default function TrustCredibilityDisplay({
                 src={a}
                 alt={`award-${idx}`}
                 className="w-24 h-24 object-contain"
+                loading="lazy"
               />
             ))}
           </div>

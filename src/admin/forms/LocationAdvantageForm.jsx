@@ -112,7 +112,7 @@ export default function LocationAdvantageForm({ onSave }) {
       {/* Map URL */}
       <div>
         <label className="block text-sm font-medium text-gray-600 mb-1">
-          Map URL (optional)
+          Map Image URL (optional)
         </label>
         <input
           type="text"

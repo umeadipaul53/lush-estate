@@ -2,15 +2,29 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import { useToast } from "../toastContext/useToast";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const { user, token, loading } = useSelector((state) => state.user);
   const { showToast } = useToast();
+  const navigate = useNavigate();
 
   // ✅ Redirect if not fully completed
-  if (!user || !token) return <Navigate to="/get-started" replace />;
-  if (!(user.isStep && user.isReserve && user.isQuestion)) {
-    return <Navigate to={`/user-step-${user.step?.stepNumber || 1}`} replace />;
+  if (!user || !token) return <Navigate to="/select-estate" replace />;
+
+  const { currentProgress, step } = user;
+
+  if (currentProgress?.stepStatus === "pending") {
+    navigate(`/user-step-${step.stepNumber}`, { replace: true });
+    return;
+  }
+
+  if (
+    currentProgress?.stepStatus === "completed" &&
+    currentProgress?.status === "pending"
+  ) {
+    navigate("/plot-reservation", { replace: true });
+    return;
   }
 
   const handleNavigate = () => {
@@ -39,14 +53,16 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-2xl shadow-md">
           <h2 className="text-xl font-semibold mb-2">Plot Reserved</h2>
           <p className="text-gray-600">
-            {user.isReserve ? "✅ Reserved" : "❌ Not Reserved"}
+            {user.currentProgress.status === "completed"
+              ? "✅ Reserved"
+              : "❌ Not Reserved"}
           </p>
         </div>
 
         <div className="bg-white p-6 rounded-2xl shadow-md">
           <h2 className="text-xl font-semibold mb-2">Questionnaire</h2>
           <p className="text-gray-600">
-            {user.isQuestion ? "✅ Completed" : "❌ Pending"}
+            {user.currentProgress.queStatus ? "✅ Completed" : "❌ Pending"}
           </p>
         </div>
       </div>
@@ -60,12 +76,6 @@ const Dashboard = () => {
             className="bg-blue-600 text-white px-6 py-3 rounded-xl text-center hover:bg-blue-700 transition"
           >
             View Plot
-          </a>
-          <a
-            onClick={handleNavigate}
-            className="bg-green-600 text-white px-6 py-3 rounded-xl text-center hover:bg-green-700 transition"
-          >
-            View Questionnaire
           </a>
         </div>
       </div>

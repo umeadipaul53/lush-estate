@@ -9,7 +9,6 @@ export default function FeaturesAmenitiesDisplay({
 }) {
   const dispatch = useDispatch();
 
-  // Get previously watched state from Redux
   const watchedState = useSelector(
     (state) => state.steps.watchedSteps[stepNumber]
   );
@@ -20,32 +19,38 @@ export default function FeaturesAmenitiesDisplay({
     ? data.video
     : [data.video];
 
-  // Initialize watched state from Redux or default to false
   const [watched, setWatched] = useState(
     watchedState?.videosWatched || Array(videos.length).fill(false)
   );
 
-  // Enable next immediately if step already completed or no videos
+  // Enable next if step already completed or no videos
   useEffect(() => {
-    if (watchedState?.completed || videos.length === 0) {
-      setIsNextEnabled(true);
-    } else {
-      setIsNextEnabled(false);
-    }
+    setIsNextEnabled(watchedState?.completed || videos.length === 0);
   }, [watchedState, videos.length, setIsNextEnabled]);
 
+  // Handle video end
   const handleVideoEnd = (idx) => {
     const updated = [...watched];
     updated[idx] = true;
     setWatched(updated);
 
-    // Update Redux store
     dispatch(markStepWatched({ stepNumber, videosWatched: updated }));
 
-    // Enable next if at least one video watched
     if (updated.some((v) => v)) {
       setIsNextEnabled(true);
     }
+  };
+
+  // Cloudinary optimized video + poster
+  const transformCloudinaryVideo = (url) => {
+    if (!url) return { video: url, poster: "" };
+    const parts = url.split("/upload/");
+    if (parts.length !== 2) return { video: url, poster: "" };
+    const publicId = parts[1].replace(".mp4", "");
+    return {
+      video: `${parts[0]}/upload/q_auto:good,f_auto/${publicId}`,
+      poster: `${parts[0]}/upload/so_0/${publicId}.jpg`,
+    };
   };
 
   return (
@@ -53,16 +58,29 @@ export default function FeaturesAmenitiesDisplay({
       <h1 className="text-3xl font-bold mb-4 text-center">{data.heading}</h1>
       <p className="text-gray-600 mb-6 text-center">{data.description}</p>
 
-      {videos.map((url, idx) => (
-        <video
-          key={idx}
-          controls
-          className="w-full rounded-xl shadow-lg mb-6"
-          onEnded={() => handleVideoEnd(idx)}
-        >
-          <source src={url} type="video/mp4" />
-        </video>
-      ))}
+      {/* Disclaimer */}
+      {videos.length > 0 && (
+        <p className="text-red-600 font-semibold text-center mb-6">
+          ⚠️ Please watch the video fully to proceed to the next step.
+        </p>
+      )}
+
+      {/* Videos */}
+      {videos.map((url, idx) => {
+        const { video, poster } = transformCloudinaryVideo(url);
+        return (
+          <video
+            key={idx}
+            controls
+            preload="metadata"
+            poster={poster}
+            className="w-full rounded-xl shadow-lg mb-6 bg-black"
+            onEnded={() => handleVideoEnd(idx)}
+          >
+            <source src={video} type="video/mp4" />
+          </video>
+        );
+      })}
     </div>
   );
 }

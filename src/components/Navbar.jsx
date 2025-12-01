@@ -4,9 +4,12 @@ import { logoutUser } from "../reducers/userReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { clearAccessToken } from "../tokenStore";
+import { useToast } from "../toastContext/useToast";
 
 const Navbar = () => {
   const dispatch = useDispatch();
+  const { showToast } = useToast();
   const { isAuthenticated } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -15,7 +18,8 @@ const Navbar = () => {
 
   const handleLogout = () => {
     dispatch(logoutUser());
-    navigate("/select-estate");
+    clearAccessToken();
+    showToast("You have been logged out", "success");
   };
 
   return (
