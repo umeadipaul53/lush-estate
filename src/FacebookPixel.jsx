@@ -6,7 +6,7 @@ export default function FacebookPixel() {
 
   useEffect(() => {
     if (window.fbq) {
-      window.fbq('track', 'PageView'); // Track every page change
+      window.fbq("track", "PageView"); // Track every page change
     }
   }, [location]);
 

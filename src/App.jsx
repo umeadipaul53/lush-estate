@@ -46,7 +46,7 @@ function App() {
 
   return (
     <AuthProvider>
-      {/* <FacebookPixel /> */}
+      <FacebookPixel />
       <div className="flex flex-col min-h-screen">
         {/* Navbar for non-admin routes */}
         {!isAdminRoute && <Navbar />}
