@@ -15,7 +15,7 @@ const PlotReservation = () => {
   const estateName = estate.estateName;
 
   const handlePlotReservation = () => {
-    if (estateName === "LUSH ESTATE") {
+    if (estateName === "Lush Estate Phase III") {
       window.location.href =
         "https://developer.sytemap.com/map/lush-estate-phase-3-";
     } else if (estateName === "ROCKVIEW ESTATE") {
