@@ -40,29 +40,14 @@ function AdminLayout() {
       icon: <Building2 size={18} />, // 🛒 Orders icon
     },
     {
-      label: "View Listing Orders",
-      path: "/admin/listing-orders",
-      icon: <ClipboardList size={18} />, // 📋 Order list icon
-    },
-    {
       label: "Tours Invite",
       path: "/admin/tours-invite",
       icon: <MapPin size={18} />, // 📍 Location/tour icon
     },
     {
-      label: "Send Message",
-      path: "/admin/send-message",
+      label: "Manage Questionaire",
+      path: "/admin/manage-questionaire",
       icon: <MessageSquare size={18} />, // 💬 Chat/message icon
-    },
-    {
-      label: "Manage News",
-      path: "/admin/manage-news",
-      icon: <Newspaper size={18} />, // 📰 News article icon
-    },
-    {
-      label: "Manage Estate",
-      path: "/admin/estate",
-      icon: <Building2 size={18} />, // 🏢 Estate management icon
     },
     {
       label: "Settings",
@@ -72,13 +57,13 @@ function AdminLayout() {
   ];
 
   const isActive = (path) =>
-    location.pathname === path ? "bg-green-800 text-white" : "text-gray-200";
+    location.pathname === path ? "bg-gray-800 text-white" : "text-gray-200";
 
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* ✅ Sidebar (Desktop) */}
-      <aside className="hidden md:flex w-64 bg-green-950 text-white flex-col">
-        <div className="p-6 text-2xl font-bold border-b border-green-800">
+      <aside className="hidden md:flex w-64 bg-black text-white flex-col">
+        <div className="p-6 text-2xl font-bold border-b border-black">
           Admin Panel
         </div>
         <nav className="flex-1 p-4 space-y-2">
@@ -86,7 +71,7 @@ function AdminLayout() {
             <button
               key={link.path}
               onClick={() => navigate(link.path)}
-              className={`flex items-center gap-3 w-full text-left p-2 rounded-lg hover:bg-green-800 transition ${isActive(
+              className={`flex items-center gap-3 w-full text-left p-2 rounded-lg hover:bg-gray-800 transition ${isActive(
                 link.path
               )}`}
             >
@@ -96,7 +81,7 @@ function AdminLayout() {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-green-800">
+        <div className="p-4 border-t border-gray-800">
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 w-full text-left p-2 rounded-lg hover:bg-red-600 transition"
@@ -115,7 +100,7 @@ function AdminLayout() {
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-y-0 left-0 z-50 w-64 bg-green-950 text-white flex flex-col shadow-lg md:hidden"
+            className="fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 text-white flex flex-col shadow-lg md:hidden"
           >
             <div className="flex items-center justify-between p-4 border-b border-green-800">
               <h2 className="text-xl font-semibold">Admin Menu</h2>
@@ -135,7 +120,7 @@ function AdminLayout() {
                     navigate(link.path);
                     setSidebarOpen(false);
                   }}
-                  className={`flex items-center gap-3 w-full text-left p-2 rounded-lg hover:bg-green-800 transition ${isActive(
+                  className={`flex items-center gap-3 w-full text-left p-2 rounded-lg hover:bg-gray-800 transition ${isActive(
                     link.path
                   )}`}
                 >
@@ -145,7 +130,7 @@ function AdminLayout() {
               ))}
             </nav>
 
-            <div className="p-4 border-t border-green-800">
+            <div className="p-4 border-t border-gray-800">
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-3 w-full text-left p-2 rounded-lg hover:bg-red-600 transition"
@@ -164,7 +149,7 @@ function AdminLayout() {
         <header className="bg-white shadow-sm px-4 py-3 flex items-center justify-between sticky top-0 z-40">
           <div className="flex items-center gap-3">
             <button
-              className="md:hidden text-green-900 hover:text-green-700"
+              className="md:hidden text-gray-800 hover:text-gray-800"
               onClick={() => setSidebarOpen(true)}
             >
               <Menu size={24} />

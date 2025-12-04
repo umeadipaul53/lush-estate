@@ -1,47 +1,38 @@
 import { useState, useEffect } from "react";
-import {
-  Search,
-  Edit,
-  Trash2,
-  Eye,
-  UserPlus,
-  Users,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Edit, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllUsers, deleteUser } from "../reducers/usersReducer";
-import Swal from "sweetalert2";
+import { getAllTourRequests, settleTourRequest } from "../reducers/tourReducer";
 import { useToast } from "../toastContext/useToast";
+import Swal from "sweetalert2";
 
-function ManageUsers() {
+export default function ToursInvite() {
   const { showToast } = useToast();
   const dispatch = useDispatch();
-  const { users, pagination } = useSelector((state) => state.users);
+  const { allTours, pagination } = useSelector((state) => state.tour);
   const [page, setPage] = useState(1);
   const [reload, setReload] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchAllUsers({ page }));
+    dispatch(getAllTourRequests({ status: "pending", page }));
   }, [dispatch, page, reload]);
 
-  const handleDeleteBTN = async (e, id) => {
+  const handleSettleRequest = async (e, id) => {
     e.preventDefault();
     e.stopPropagation();
 
     const confirmation = await Swal.fire({
-      title: "Delete User",
-      text: "Are you sure you want to delete this user?",
+      title: "Settle Tour Request",
+      text: "Note: Tours request can only be settled when tour has been carried out. Are you sure you want to settle this tour request?",
       showDenyButton: false,
       showCancelButton: true,
-      confirmButtonText: "Yes, Delete user",
+      confirmButtonText: "Yes, Proceed",
       confirmButtonColor: "#228B22",
       cancelButtonColor: "#DC143C",
     });
 
     if (confirmation.isConfirmed) {
       try {
-        const res = await dispatch(deleteUser(id)).unwrap();
+        const res = await dispatch(settleTourRequest(id)).unwrap();
 
         const message = res.message;
 
@@ -59,7 +50,7 @@ function ManageUsers() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
           <h1 className="text-xl sm:text-2xl font-semibold flex items-center gap-2 text-gray-800">
-            <Users className="text-blue-600" /> Manage Members
+            <MapPin className="text-blue-600" /> Manage Tours Invite
           </h1>
         </div>
 
@@ -68,47 +59,58 @@ function ManageUsers() {
           <table className="min-w-full text-sm text-left border-collapse">
             <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
               <tr>
-                <th className="px-6 py-3 whitespace-nowrap">S/N</th>
-                <th className="px-6 py-3 whitespace-nowrap">Name</th>
-                <th className="px-6 py-3 whitespace-nowrap">Email</th>
-                <th className="px-6 py-3 whitespace-nowrap">Phone Number</th>
-                <th className="px-6 py-3 whitespace-nowrap">Date registered</th>
+                <th className="p-3 text-left">S/N</th>
+                <th className="p-3 text-left">Name</th>
+                <th className="p-3 text-left">Email</th>
+                <th className="p-3 text-left">Phone Number</th>
+                <th className="p-3 text-left">Time & Date (Scheduled)</th>
                 <th className="px-6 py-3 text-center whitespace-nowrap">
-                  Actions
+                  Approve
                 </th>
               </tr>
             </thead>
             <tbody>
-              {users?.length === 0 ? (
+              {allTours.length === 0 ? (
                 <tr>
                   <td colSpan="5" className="text-center py-6 text-gray-500">
-                    No Users found.
+                    No Tours invite found.
                   </td>
                 </tr>
               ) : (
-                users.map((member, i) => (
+                allTours.map((request, i) => (
                   <tr
                     key={i}
                     className="border-b hover:bg-gray-50 transition-colors"
                   >
-                    <td className="px-6 py-3">
+                    <td className="p-3 text-sm text-gray-700">
                       {(pagination.currentPage - 1) * pagination.limit +
                         (i + 1)}
                     </td>
-                    <td className="px-6 py-3">{member.name}</td>
-                    <td className="px-6 py-3">{member.email}</td>
-                    <td className="px-6 py-3">{member.phone}</td>
-                    <td className="px-6 py-3">
-                      {member.createdAt.split("T")[0]}
+                    <td className="p-3 text-sm text-gray-700">
+                      {request.name}
+                    </td>
+                    <td className="p-3 text-sm text-gray-700">
+                      {request.email}
+                    </td>
+                    <td className="p-3 text-sm text-gray-700">
+                      {request.phone}
                     </td>
 
+                    <td className="p-3 text-sm">
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100">
+                        <span className="text-red-600">{request.time}</span>{" "}
+                        <span className="text-green-700">
+                          {request.date.split("T")[0]}
+                        </span>
+                      </span>
+                    </td>
                     <td className="px-6 py-3 flex justify-center gap-2">
                       <button
-                        className="p-1.5 hover:bg-red-100 text-red-600 rounded-md"
-                        title="Delete"
-                        onClick={(e) => handleDeleteBTN(e, member._id)}
+                        className="p-1.5 hover:bg-yellow-100 text-yellow-600 rounded-md"
+                        title="Settle Request"
+                        onClick={(e) => handleSettleRequest(e, request._id)}
                       >
-                        <Trash2 size={16} />
+                        <Edit size={16} />
                       </button>
                     </td>
                   </tr>
@@ -143,40 +145,45 @@ function ManageUsers() {
 
         {/* ✅ Mobile & Tablet Card Layout */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:hidden">
-          {users.length === 0 ? (
+          {allTours.length === 0 ? (
             <p className="text-center text-gray-500 py-6 col-span-full">
-              No Users found.
+              No Tour request found.
             </p>
           ) : (
-            users.map((member, i) => (
+            allTours.map((request, i) => (
               <div
                 key={i}
                 className="bg-white p-3 rounded-lg shadow border flex flex-col justify-between h-auto"
               >
                 <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <h2 className="font-semibold text-gray-800 text-sm">
-                      {member.name}
-                    </h2>
+                  <div className="flex justify-between mb-2">
+                    <span className="font-medium text-gray-700">
+                      {request.name}
+                    </span>
+                    <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100">
+                      <span className="text-red-600">{request.time}</span>{" "}
+                      <span className="text-green-700">
+                        {request.date.split("T")[0]}
+                      </span>
+                    </span>
                   </div>
-                  <p className="text-xs text-gray-600 truncate">
-                    {member.email}
+                  <p className="text-sm text-gray-600">
+                    <span className="font-semibold">Email:</span>{" "}
+                    {request.email}
                   </p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    Phone Number: {member.phone}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    Date of Registration: {member.createdAt.split("T")[0]}
+                  <p className="text-sm text-gray-600">
+                    <span className="font-semibold">Phone Number:</span>{" "}
+                    {request.phone}
                   </p>
                 </div>
 
                 <div className="flex justify-end gap-2 pt-2">
                   <button
-                    className="p-1 hover:bg-red-100 text-red-600 rounded-md"
-                    title="Delete"
-                    onClick={(e) => handleDeleteBTN(e, member._id)}
+                    className="p-1 hover:bg-yellow-100 text-yellow-600 rounded-md"
+                    title="Settle Request"
+                    onClick={(e) => handleSettleRequest(e, request._id)}
                   >
-                    <Trash2 size={14} />
+                    <Edit size={14} />
                   </button>
                 </div>
               </div>
@@ -210,5 +217,3 @@ function ManageUsers() {
     </div>
   );
 }
-
-export default ManageUsers;

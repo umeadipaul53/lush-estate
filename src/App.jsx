@@ -1,6 +1,7 @@
 // src/App.jsx
 import { useRef, useEffect } from "react";
 import "./App.css";
+import { useAnalytics } from "./useAnalytics";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { restoreEstate } from "./reducers/estateReducer";
@@ -26,6 +27,10 @@ import Questionnaire from "./pages/Questionnaire";
 import StepLayout from "./components/StepLayout";
 import ManageEstate from "./admin/ManageEstate";
 import CreateEstate from "./admin/CreateEstate";
+import ToursInvite from "./admin/ToursInvite";
+import Settings from "./admin/Settings";
+import ManageQuestionaire from "./admin/ManageQuestionaire";
+import CreateQuestionaire from "./admin/CreateQuestionaire";
 import {
   UserProtectedRoute,
   AdminProtectedRoute,
@@ -37,6 +42,8 @@ function App() {
   const dispatch = useDispatch();
   const location = useLocation();
   const scrollRef = useRef(null);
+
+  useAnalytics();
 
   const isAdminRoute = /^\/admin(\/|$)/.test(location.pathname);
 
@@ -169,6 +176,16 @@ function App() {
                 <Route path="users" element={<ManageUsers />} />
                 <Route path="manage-estate" element={<ManageEstate />} />
                 <Route path="create-estate" element={<CreateEstate />} />
+                <Route path="tours-invite" element={<ToursInvite />} />
+                <Route
+                  path="manage-questionaire"
+                  element={<ManageQuestionaire />}
+                />
+                <Route path="settings" element={<Settings />} />
+                <Route
+                  path="add-questionaire/:estateId"
+                  element={<CreateQuestionaire />}
+                />
               </Route>
 
               <Route path="*" element={<NotFound />} />

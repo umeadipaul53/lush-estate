@@ -5,6 +5,7 @@ import plotsReducer from "../reducers/plotReducer";
 import questionaireReducer from "../reducers/questionaireReducer";
 import tourReducer from "../reducers/tourReducer";
 import estateReducer from "../reducers/estateReducer";
+import usersReducer from "../reducers/usersReducer";
 import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
 import { persistStore, persistReducer } from "redux-persist";
 
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
   questionaire: questionaireReducer,
   tour: tourReducer,
   estates: estateReducer,
+  users: usersReducer,
 });
 
 const persistConfig = {

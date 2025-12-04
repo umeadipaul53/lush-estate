@@ -25,13 +25,66 @@ export const secheduleTour = createAsyncThunk(
   }
 );
 
+//--- FETCH ALL TOUR REQUESTS
+export const getAllTourRequests = createAsyncThunk(
+  "tour/getAllTourRequests",
+  async ({ status, page }, { rejectWithValue }) => {
+    try {
+      const response = await API.get("/admin/v1/fetch-all-tours", {
+        withCredentials: true,
+        params: {
+          status,
+          page,
+        },
+      });
+
+      const { count, pagination, data } = response.data;
+      return { count, pagination, data };
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch tour requests"
+      );
+    }
+  }
+);
+
+//--- SETTLE TOUR REQUEST ---
+export const settleTourRequest = createAsyncThunk(
+  "tour/settleTourRequest",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await API.patch(
+        `/admin/v1/settle-tours/${id}`,
+        {},
+        { withCredentials: true }
+      );
+
+      const { message } = response.data;
+      return { message }; // { action: "added" | "removed", data: {...} }
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to toggle favourite"
+      );
+    }
+  }
+);
+
 const tourSlice = createSlice({
   name: "tour",
   initialState: {
     returnMessage: null, // message
     loading: false,
-    count: 0,
+    allTours: [],
+    tourNumber: 0,
     error: null,
+    pagination: {
+      currentPage: 1,
+      totalPages: 1,
+      totalResults: 0,
+      limit: 10,
+      hasNextPage: false,
+      hasPrevPage: false,
+    },
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -45,6 +98,33 @@ const tourSlice = createSlice({
         state.returnMessage = action.payload.message;
       })
       .addCase(secheduleTour.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      //--- GET TOUR REQUESTS ---
+      .addCase(getAllTourRequests.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getAllTourRequests.fulfilled, (state, action) => {
+        state.loading = false;
+        state.allTours = action.payload.data;
+        state.pagination = action.payload.pagination;
+        state.tourNumber = action.payload.count;
+      })
+      .addCase(getAllTourRequests.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // --- SETTLE TOURS---
+      .addCase(settleTourRequest.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(settleTourRequest.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(settleTourRequest.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

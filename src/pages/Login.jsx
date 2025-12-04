@@ -101,12 +101,12 @@ function Login() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8"
+          className="w-full max-w-md bg-black shadow-xl rounded-2xl p-8"
         >
           {/* Logo */}
           <div className="flex justify-center mb-6">
             <img
-              src="/logo-new-removebg-preview.png"
+              src="/images/logo.png"
               alt="Tehlex Limited Logo"
               className="h-10"
             />
