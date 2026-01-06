@@ -5,7 +5,7 @@ import { useAnalytics } from "./useAnalytics";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { restoreEstate } from "./reducers/estateReducer";
-import Home from "./pages/Home";
+import HomeOld from "./pages/HomeOld";
 import GetStarted from "./pages/GetStarted";
 import SelectEstate from "./pages/SelectEstate";
 import Navbar from "./components/Navbar";
@@ -37,6 +37,7 @@ import {
 } from "./components/ProtectedRoute";
 import AuthProvider from "./components/AuthProvider";
 import FacebookPixel from "./FacebookPixel";
+import Home from "./pages/Home";
 
 function App() {
   const dispatch = useDispatch();

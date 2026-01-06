@@ -1,28 +1,24 @@
-import React from "react";
-import Hero from "../components/Hero";
-import EstateDescription from "../components/EstateDescription";
-import CallToAction from "../components/CallToAction";
+import Navbar from "../content/Navbar";
+import Hero from "../content/Hero";
+import WhyInvest from "../content/WhyInvest";
+import Location from "../content/Location";
+import Security from "../content/Security";
+import VirtualInspection from "../content/VirtualInspection";
+import Testimonials from "../content/Testimonials";
+import FinalCTA from "../content/FinalCTA";
 import FloatingContact from "../components/FloatingContact";
 
 const Home = () => {
   return (
-    <div>
-      {/* Hero Section */}
-      <section data-scroll-section>
-        <Hero />
-      </section>
-
-      {/* Estate Description */}
-      <section data-scroll-section>
-        <EstateDescription />
-      </section>
-
-      {/* Call To Action */}
-      <section data-scroll-section>
-        <CallToAction />
-      </section>
-
-      {/* Floating contact stays fixed */}
+    <div className="bg-black text-white">
+      <Navbar />
+      <Hero />
+      <WhyInvest />
+      <Location />
+      <Security />
+      <VirtualInspection />
+      <Testimonials />
+      <FinalCTA />
       <FloatingContact />
     </div>
   );
